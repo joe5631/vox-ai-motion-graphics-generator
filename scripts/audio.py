@@ -41,7 +41,9 @@ def run(project_dir: str):
 
     prov = get_provider(doc.get("provider"))
     voice = doc.get("voice", {})
+    voice_model = voice.get("model", VOICE_MODEL)
     voice_id = voice.get("voice_id", "Q19bea09caa6IRAeW7")
+    voice_name = voice.get("voice")
     language = voice.get("language", doc.get("language", "en"))
     speed = float(voice.get("speed", 1.0))
 
@@ -56,20 +58,30 @@ def run(project_dir: str):
     for beat in doc["beats"]:
         if clone_ref:
             specs[f"narr_{beat['id']}"] = (lambda t=beat["narration"]: prov.submit_audio(
-                VOICE_MODEL,
+                voice_model,
                 text=CLONE_TEMPLATE.format(language=lang_name, persona=persona, script=t),
                 format="mp3", sample_rate=44100,
                 references=[{"audio_data": ref_b64}]))
         else:
-            specs[f"narr_{beat['id']}"] = (lambda t=beat["narration"]: prov.submit_audio(
-                VOICE_MODEL, prompt=t, text=t, language=language, voice_id=voice_id,
-                codec="mp3", sample_rate=44100, speed=speed))
+            voice_params = {
+                "language": language,
+                "voice_id": voice_id,
+                "codec": "mp3",
+                "format": "mp3",
+                "sample_rate": 44100,
+                "speed": speed,
+            }
+            if voice_name:
+                voice_params["voice"] = voice_name
+            specs[f"narr_{beat['id']}"] = (lambda t=beat["narration"], p=voice_params: prov.submit_audio(
+                voice_model, prompt=t, text=t, **p))
 
     bgm_path = os.path.join(adir, "bgm.mp3")
     if not os.path.exists(bgm_path):
         music_prompt = doc.get("music", "cinematic paper-collage explainer BGM, energetic rhythmic beat")
+        music_model = doc.get("music_model", MUSIC_MODEL)
         specs["bgm"] = (lambda mp=music_prompt: prov.submit_audio(
-            MUSIC_MODEL, prompt=mp, style=mp, is_instrumental=True, format="mp3"))
+            music_model, prompt=mp, style=mp, is_instrumental=True, format="mp3"))
     else:
         print(f"[bgm] reuse existing {bgm_path}")
 

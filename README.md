@@ -178,6 +178,30 @@ export MUAPI_API_KEY="your-api-key"     # image / video / voice / music models â
 export OPENAI_API_KEY="your-openai-key"  # story planning & ASR
 ```
 
+Atlas Cloud is also available as an optional media backend. Set its key and select
+the provider plus models in `beats.json`; the default MuAPI workflow is unchanged:
+
+```bash
+export ATLASCLOUD_API_KEY="your-api-key"
+```
+
+```json
+{
+  "provider": "atlas_cloud",
+  "image_model": "google/nano-banana-2-lite/text-to-image",
+  "video_model": "google/veo3.1/image-to-video",
+  "voice": {
+    "model": "minimax/speech-2.6-turbo",
+    "voice": "English_expressive_narrator"
+  },
+  "music_model": "suno/chirp-v5"
+}
+```
+
+Atlas submissions are sent once and are never automatically re-submitted. The
+pipeline only polls the returned prediction ID until it completes, fails, or the
+stage deadline is reached.
+
 **3. Run Pipeline via Agent or CLI:**
 
 #### Mode 1: B-roll (Topic â†’ Film)

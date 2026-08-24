@@ -113,6 +113,29 @@ https://github.com/user-attachments/assets/6628b678-78ff-481a-bc39-d7098ec1f2fe
 ```bash
 export MUAPI_API_KEY="sk-..."
 
+# 可选：改用 Atlas Cloud 媒体后端
+export ATLASCLOUD_API_KEY="your-api-key"
+```
+
+Atlas Cloud 不会改变默认的 MuAPI 流程。在 `beats.json` 中显式选择后端及模型：
+
+```json
+{
+  "provider": "atlas_cloud",
+  "image_model": "google/nano-banana-2-lite/text-to-image",
+  "video_model": "google/veo3.1/image-to-video",
+  "voice": {
+    "model": "minimax/speech-2.6-turbo",
+    "voice": "English_expressive_narrator"
+  },
+  "music_model": "suno/chirp-v5"
+}
+```
+
+Atlas 生成请求只提交一次，不会自动重提；流水线只会有界轮询返回的 prediction ID。
+
+```bash
+
 # 1. B-roll (选题成片)
 python scripts/style_bakeoff.py out/my-topic american-retro,swiss-modern,punk-zine
 python scripts/keyframes.py out/my-topic

@@ -13,6 +13,7 @@ This repository is an **Agent Skill**: a self-contained workflow that turns a to
 
 ## Requirements
 
-- `MUAPI_API_KEY` in the environment — https://muapi.ai
+- `MUAPI_API_KEY` in the environment — https://muapi.ai (default provider), or
+  `ATLASCLOUD_API_KEY` with `"provider": "atlas_cloud"` in `beats.json`
 - `ffmpeg` + `ffprobe`
 - Python 3 with `Pillow`
